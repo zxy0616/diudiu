@@ -1,6 +1,6 @@
 import { escapeHTML as esc, validateTarget, summarize, safeReply, readMemory } from './core.js';
 const asset = p => new URL('../design-kit/assets/' + p, import.meta.url).href;
-const icon = name => `<img class="icon" alt="" src="${new URL('icons/' + name + '.svg', import.meta.url).href}">`;
+const icon = name => `<img class="icon" alt="" src="${new URL('icons/' + (name === 'Settings' ? 'settings' : name) + '.svg', import.meta.url).href}">`;
 const image = (path, cls='', alt='') => `<img class="${cls}" src="${asset(path)}" alt="${alt}">`;
 const app = document.querySelector('#app');
 const dialog = document.querySelector('#dialog');
