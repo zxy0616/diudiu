@@ -1,0 +1,338 @@
+[
+  {
+    "id": "emotions/calm",
+    "file": "assets/ip/emotions/calm.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "emotions",
+    "source_box": [
+      0,
+      0,
+      444,
+      444
+    ]
+  },
+  {
+    "id": "emotions/happy",
+    "file": "assets/ip/emotions/happy.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "emotions",
+    "source_box": [
+      444,
+      0,
+      887,
+      444
+    ]
+  },
+  {
+    "id": "emotions/sad",
+    "file": "assets/ip/emotions/sad.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "emotions",
+    "source_box": [
+      887,
+      0,
+      1330,
+      444
+    ]
+  },
+  {
+    "id": "emotions/tired",
+    "file": "assets/ip/emotions/tired.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "emotions",
+    "source_box": [
+      1330,
+      0,
+      1774,
+      444
+    ]
+  },
+  {
+    "id": "emotions/frustrated",
+    "file": "assets/ip/emotions/frustrated.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "emotions",
+    "source_box": [
+      0,
+      444,
+      444,
+      887
+    ]
+  },
+  {
+    "id": "emotions/surprised",
+    "file": "assets/ip/emotions/surprised.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "emotions",
+    "source_box": [
+      444,
+      444,
+      887,
+      887
+    ]
+  },
+  {
+    "id": "emotions/relieved",
+    "file": "assets/ip/emotions/relieved.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "emotions",
+    "source_box": [
+      887,
+      444,
+      1330,
+      887
+    ]
+  },
+  {
+    "id": "emotions/thoughtful",
+    "file": "assets/ip/emotions/thoughtful.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "emotions",
+    "source_box": [
+      1330,
+      444,
+      1774,
+      887
+    ]
+  },
+  {
+    "id": "actions/wave",
+    "file": "assets/ip/actions/wave.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "static-pose",
+    "source_box": [
+      0,
+      0,
+      444,
+      444
+    ]
+  },
+  {
+    "id": "actions/listen",
+    "file": "assets/ip/actions/listen.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "static-pose",
+    "source_box": [
+      444,
+      0,
+      887,
+      444
+    ]
+  },
+  {
+    "id": "actions/nod",
+    "file": "assets/ip/actions/nod.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "static-pose",
+    "source_box": [
+      887,
+      0,
+      1330,
+      444
+    ]
+  },
+  {
+    "id": "actions/crumple",
+    "file": "assets/ip/actions/crumple.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "static-pose",
+    "source_box": [
+      1330,
+      0,
+      1774,
+      444
+    ]
+  },
+  {
+    "id": "actions/throw",
+    "file": "assets/ip/actions/throw.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "static-pose",
+    "source_box": [
+      0,
+      444,
+      444,
+      887
+    ]
+  },
+  {
+    "id": "actions/gentle-shake",
+    "file": "assets/ip/actions/gentle-shake.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "static-pose",
+    "source_box": [
+      444,
+      444,
+      887,
+      887
+    ]
+  },
+  {
+    "id": "actions/stretch",
+    "file": "assets/ip/actions/stretch.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "static-pose",
+    "source_box": [
+      887,
+      444,
+      1330,
+      887
+    ]
+  },
+  {
+    "id": "actions/hold-note",
+    "file": "assets/ip/actions/hold-note.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "static-pose",
+    "source_box": [
+      1330,
+      444,
+      1774,
+      887
+    ]
+  },
+  {
+    "id": "props/paper-ball",
+    "file": "assets/props/paper-ball.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "props",
+    "source_box": [
+      0,
+      0,
+      444,
+      444
+    ]
+  },
+  {
+    "id": "props/paper-target",
+    "file": "assets/props/paper-target.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "props",
+    "source_box": [
+      444,
+      0,
+      887,
+      444
+    ]
+  },
+  {
+    "id": "props/toilet",
+    "file": "assets/props/toilet.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "props",
+    "source_box": [
+      887,
+      0,
+      1330,
+      444
+    ]
+  },
+  {
+    "id": "props/water-vortex",
+    "file": "assets/props/water-vortex.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "props",
+    "source_box": [
+      1330,
+      0,
+      1774,
+      444
+    ]
+  },
+  {
+    "id": "props/ice-intact",
+    "file": "assets/props/ice-intact.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "props",
+    "source_box": [
+      0,
+      444,
+      444,
+      887
+    ]
+  },
+  {
+    "id": "props/ice-cracked",
+    "file": "assets/props/ice-cracked.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "props",
+    "source_box": [
+      444,
+      444,
+      887,
+      887
+    ]
+  },
+  {
+    "id": "props/envelope",
+    "file": "assets/props/envelope.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "props",
+    "source_box": [
+      887,
+      444,
+      1330,
+      887
+    ]
+  },
+  {
+    "id": "props/paper-plane",
+    "file": "assets/props/paper-plane.png",
+    "width": 512,
+    "height": 512,
+    "alpha": true,
+    "type": "props",
+    "source_box": [
+      1330,
+      444,
+      1774,
+      887
+    ]
+  }
+]

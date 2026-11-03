@@ -1,0 +1,55 @@
+{
+  "colors": {
+    "background": "#FFF8ED",
+    "surface": "#FCEBD7",
+    "primary": "#B9572F",
+    "primaryIllustration": "#C66B40",
+    "text": "#4C2B18",
+    "textSecondary": "#805C43",
+    "sage": "#8A9460",
+    "ice": "#A6C1CD",
+    "border": "#D6B799",
+    "white": "#FFFFFF"
+  },
+  "typography": {
+    "fontFamily": "system-ui, -apple-system, BlinkMacSystemFont, \"PingFang SC\", \"Microsoft YaHei\", sans-serif",
+    "body": 16,
+    "bodyLineHeight": 1.65,
+    "heading": 28,
+    "small": 14,
+    "button": 18
+  },
+  "layout": {
+    "referenceViewport": [
+      390,
+      844
+    ],
+    "sidePadding": 20,
+    "spacing": [
+      4,
+      8,
+      12,
+      16,
+      24,
+      32
+    ],
+    "minTapTarget": 44,
+    "buttonMinHeight": 52,
+    "inputMinHeight": 48,
+    "radius": [
+      12,
+      16,
+      24
+    ]
+  },
+  "motion": {
+    "feedbackMs": 120,
+    "transitionMs": 240,
+    "ritualMs": [
+      1200,
+      3000
+    ],
+    "respectReducedMotion": true
+  },
+  "note": "Engineering token values are authoritative; generated raster colors and font shapes are visual references, not exact measurements."
+}

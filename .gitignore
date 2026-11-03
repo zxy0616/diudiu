@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+coverage/
+playwright-report/
+test-results/
+.local/
+private-data/
+dist/

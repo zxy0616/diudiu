@@ -1,0 +1,34 @@
+import { createRequire } from 'node:module';
+import assert from 'node:assert/strict';
+const require=createRequire(import.meta.url);
+const { chromium }=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const browser=await chromium.launch({headless:true,args:['--use-fake-device-for-media-stream','--use-fake-ui-for-media-stream'],...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
+const context=await browser.newContext({viewport:{width:390,height:844},permissions:['microphone']});
+const page=await context.newPage();
+const errors=[];page.on('pageerror',e=>errors.push(e.message));
+const click=a=>page.locator(`[data-action="${a}"]`).last().click();
+try{
+  await page.goto(process.env.TEST_URL||'http://127.0.0.1:4173');
+  await click('start');await click('accept-start');
+  const bytes=await page.evaluate(async()=>{const c=document.createElement('canvas');c.width=200;c.height=100;const ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,200,100);ctx.fillStyle='black';ctx.fillText('Synthetic private name',20,40);return [...new Uint8Array(await (await new Promise(r=>c.toBlob(r))).arrayBuffer())];});
+  await page.locator('#image-picker').setInputFiles({name:'synthetic.png',mimeType:'image/png',buffer:Buffer.from(bytes)});
+  await page.locator('#image-canvas[data-ready="true"]').waitFor();
+  const box=await page.locator('#image-canvas').boundingBox();
+  await page.mouse.move(box.x+10,box.y+10);await page.mouse.down();await page.mouse.move(box.x+box.width-10,box.y+box.height-10);await page.mouse.up();
+  await click('accept-image');
+  const pixel=await page.locator('.attachment img:not(.icon)').evaluate(async img=>{await img.decode();const c=document.createElement('canvas');c.width=200;c.height=100;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);return [...ctx.getImageData(100,50,1,1).data];});
+  assert.deepEqual(pixel,[76,43,24,255],'redaction is baked into opaque pixel data');
+  await click('record');await click('confirm-record');
+  await page.locator('#record-clock').waitFor();
+  await page.waitForTimeout(1200);await click('stop-record');
+  await page.locator('.inline-audio audio').waitFor();
+  await page.locator('#draft').fill('这是合成媒体测试。');
+  await click('send');await click('collect');
+  assert.equal(await page.locator('[data-message="assistant"]').count(),0);
+  assert.equal(await page.locator('[data-message="user"] audio').count(),1);
+  await click('exit');await click('confirm-exit');
+  assert.equal(await page.locator('audio').count(),0);
+  await page.reload();assert.equal(await page.locator('.attachment').count(),0);
+  assert.deepEqual(errors,[]);
+  console.log('Media browser checks passed: synthetic image upload, baked redaction pixels, synthetic microphone recording/preview, silent media submit, exit cleanup.');
+}finally{await browser.close();}

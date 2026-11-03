@@ -1,0 +1,382 @@
+[
+  {
+    "path": "design-kit/index.html",
+    "bytes": 13534,
+    "sha256": "f7db43c1571eb0130571c528ca2b6940cbf6e6786089ad40d6c65fc3c8a46b3b"
+  },
+  {
+    "path": "design-kit/sources/home-v1.1.png",
+    "bytes": 1841864,
+    "sha256": "4f53de24eb221cedb18a77d7cec8ff0d1d85bfd481b5a943b049208452927efc"
+  },
+  {
+    "path": "design-kit/sources/selected-home-original.png",
+    "bytes": 1669539,
+    "sha256": "45cfb5d6c08870a8ee926be16f6593ec9e4a57f3b41bacb668a91f5b613c32c5"
+  },
+  {
+    "path": "design-kit/sources/emotions-atlas-original.png",
+    "bytes": 1425074,
+    "sha256": "09ae82ebeb0d81d1f9813cc704779531e09fbb7afc51acd6f7b7ee2a16d9b359"
+  },
+  {
+    "path": "design-kit/sources/props-atlas-original.png",
+    "bytes": 1310088,
+    "sha256": "6e6073ce1fae60c901de42a3a9e22294fa7d45a1f440639ec8e04c71124a2628"
+  },
+  {
+    "path": "design-kit/sources/actions-atlas-original.png",
+    "bytes": 943916,
+    "sha256": "2ca048eac78043f736f11bd13f370c53e28c90a783299ad8a594025ea13e068a"
+  },
+  {
+    "path": "design-kit/sources/logo-original.png",
+    "bytes": 541903,
+    "sha256": "d20f268057f142d96e8fefc845a893d06096d0569a223a6f58f5363a1d1ce55e"
+  },
+  {
+    "path": "design-kit/docs/page-index.json",
+    "bytes": 1162,
+    "sha256": "d639bec8f59798b90c562fa2aadaf185111e80d2bf917477d20052766156089d"
+  },
+  {
+    "path": "design-kit/docs/design-tokens.json",
+    "bytes": 1122,
+    "sha256": "5b3233b18a995fec85d27ed5691d0dcc3dc13bd46c9e57e7bc98c9bb7d9254ea"
+  },
+  {
+    "path": "design-kit/docs/视觉与IP规范.md",
+    "bytes": 4744,
+    "sha256": "f0b53c7461220bfaa96716ffdd2a39c2394ee6300908f015aa6589da46e4fbb9"
+  },
+  {
+    "path": "design-kit/docs/功能与后端增量规格_v1.2.md",
+    "bytes": 7068,
+    "sha256": "044e29b67d50551c0001f74502deb757c43131b7f6a7f26d0949d6f400348511"
+  },
+  {
+    "path": "design-kit/docs/本轮生成提示词_v1.1.md",
+    "bytes": 8878,
+    "sha256": "033b70ecbc8cb0373c5a570132a0ddcc53de3840e849e5f489f135cea6be8749"
+  },
+  {
+    "path": "design-kit/docs/asset-manifest.json",
+    "bytes": 5550,
+    "sha256": "72792fe68afb24153950aceee10c4bea93c331b231079d3087359db76fdb7da2"
+  },
+  {
+    "path": "design-kit/docs/生成提示词.md",
+    "bytes": 19654,
+    "sha256": "129aa5685ad78c3a1264364be454cb3aa7fa9dd6c310d987bd70286b944b6c7f"
+  },
+  {
+    "path": "design-kit/docs/UX设计说明.md",
+    "bytes": 10146,
+    "sha256": "a0a84df1e53936d3623fc8ba8dd521c4a438520303267ddb2ec591246716acf4"
+  },
+  {
+    "path": "design-kit/ui/boards/02-grounded-responses.png",
+    "bytes": 1752712,
+    "sha256": "57580b49ae1ace1db6f86b65b49e3047e9ad1436c28db79ff5e6bc4cd2d2d02b"
+  },
+  {
+    "path": "design-kit/ui/boards/03-target-and-image.png",
+    "bytes": 2199023,
+    "sha256": "449c51fbb3cfd1b626ff365693aa23c471000921d491bafab213918bb40f4b4f"
+  },
+  {
+    "path": "design-kit/ui/boards/01-input-and-direction.png",
+    "bytes": 1955834,
+    "sha256": "3585729a9d9708d2080611b25faa4c0f89ba9df54c8aea242c979dd5622db81a"
+  },
+  {
+    "path": "design-kit/ui/screens/16-release-note.png",
+    "bytes": 464162,
+    "sha256": "1c49d73e1fdefb86bafd03fb369660665b264dec42eda0a928572fad81f3a7f3"
+  },
+  {
+    "path": "design-kit/ui/screens/24-privacy.png",
+    "bytes": 381244,
+    "sha256": "26cb44d9223d6255ac78972b68cb96a91d42c6fdb697c1e54c34c17eba495e70"
+  },
+  {
+    "path": "design-kit/ui/screens/23-context-use.png",
+    "bytes": 375280,
+    "sha256": "4af0ead87267105e6e54f36f7626660a9602923edd29aa39342b911a8ab4a16f"
+  },
+  {
+    "path": "design-kit/ui/screens/26-network-error.png",
+    "bytes": 340590,
+    "sha256": "730d89dfa556e5cd511742b264ba358e3266de7805a785206065a43873de0b48"
+  },
+  {
+    "path": "design-kit/ui/screens/18-motion-permission.png",
+    "bytes": 416518,
+    "sha256": "77d0a5d8e42268bffc8bc1bd1aab41ec9732fc3f14305194eb4228941dc48235"
+  },
+  {
+    "path": "design-kit/ui/screens/19-release-end.png",
+    "bytes": 411160,
+    "sha256": "26bef1b3fce17f8717e94eda990825ee5003ea2e05311d13485905d1c8119de0"
+  },
+  {
+    "path": "design-kit/ui/screens/17-flush.png",
+    "bytes": 531013,
+    "sha256": "cf9037ae4e75d0afc78513228c77f1c092243ce06b38e75e13888df2af5b353c"
+  },
+  {
+    "path": "design-kit/ui/screens/09-target-confirm.png",
+    "bytes": 532731,
+    "sha256": "a41ccd061d09053ec21ba68d79c4ad269f7c612da9f121cd4694abf195f17b5b"
+  },
+  {
+    "path": "design-kit/ui/screens/02-direction.png",
+    "bytes": 451920,
+    "sha256": "cb7aeb842ac3d7ab9bcf08c69102764121ef1de1c2605a7baae5032f7baf44b2"
+  },
+  {
+    "path": "design-kit/ui/screens/27-delete-confirm.png",
+    "bytes": 400077,
+    "sha256": "28532e2c3a285607140101328f171840db119895cca4d0ba4518a1ccfbe28311"
+  },
+  {
+    "path": "design-kit/ui/screens/25-first-use.png",
+    "bytes": 392924,
+    "sha256": "8020f0de14b1dc95b757de4031a5061c8981a51fbb063c01435239401b4ee695"
+  },
+  {
+    "path": "design-kit/ui/screens/14-listen-end.png",
+    "bytes": 436841,
+    "sha256": "d351ae6b82078e3471d3c16c50106e4386a1d445911aa6cf92a276fd38c1efff"
+  },
+  {
+    "path": "design-kit/ui/screens/05-empathy.png",
+    "bytes": 409306,
+    "sha256": "89f2375d4cd0993cb2e52f4a9448e5127c7664b4d8840e5dffe26ca43995f234"
+  },
+  {
+    "path": "design-kit/ui/screens/06-suggestions.png",
+    "bytes": 390090,
+    "sha256": "caa014fad08f6161a92a39ad1504cc77685cc5c1188eb5ddcd346aaf896aec07"
+  },
+  {
+    "path": "design-kit/ui/screens/21-context-list.png",
+    "bytes": 434368,
+    "sha256": "d0c29546e5c71af1f783c9770507109ed226b184b30e31dd0e71f1d20db4242d"
+  },
+  {
+    "path": "design-kit/ui/screens/03-quiet.png",
+    "bytes": 456732,
+    "sha256": "d724df925f7120a229399fa59790165015cabb690e11017455a0d5dcddb5b2b0"
+  },
+  {
+    "path": "design-kit/ui/screens/13-correct.png",
+    "bytes": 414655,
+    "sha256": "3d34b4facb029ff07f9070042f94e1018b427479a2b0da549ebcb2dd29ba9fbc"
+  },
+  {
+    "path": "design-kit/ui/screens/08-search-empty.png",
+    "bytes": 374958,
+    "sha256": "1cc5a850a1745f06ba38db6e62b6cbde04900379113a9a46d08c55e882b264e9"
+  },
+  {
+    "path": "design-kit/ui/screens/00-home.png",
+    "bytes": 1841864,
+    "sha256": "4f53de24eb221cedb18a77d7cec8ff0d1d85bfd481b5a943b049208452927efc"
+  },
+  {
+    "path": "design-kit/ui/screens/01-input.png",
+    "bytes": 453749,
+    "sha256": "cd2e250d57c3af8664613da0f16bb73096156be629c95db30769a57022eb5717"
+  },
+  {
+    "path": "design-kit/ui/screens/12-image-review.png",
+    "bytes": 393160,
+    "sha256": "7a5608667ecec48b32db25e98bd42b9a42dbf8ef131a2af8861037c214eaff4e"
+  },
+  {
+    "path": "design-kit/ui/screens/07-sources.png",
+    "bytes": 406218,
+    "sha256": "fa10dd0106ec52ae631018bf9ff0c83cec524e22947ec87fdcda7ce88c3ca4ac"
+  },
+  {
+    "path": "design-kit/ui/screens/22-context-confirm.png",
+    "bytes": 374854,
+    "sha256": "e6471fa55277dfd4cb701243ecb25cae37278c88d97f1dfc3c6ec7a5e0863b1c"
+  },
+  {
+    "path": "design-kit/ui/screens/15-release-menu.png",
+    "bytes": 505667,
+    "sha256": "9a7772d7fb96dba9b37d426676f975275b546dc30e0538990a2798dc40e9e188"
+  },
+  {
+    "path": "design-kit/ui/screens/04-summary.png",
+    "bytes": 450363,
+    "sha256": "668094cc998f93da1bdb03d3581a2a0ba2d2309a79d1da138b2aff4682ee33cc"
+  },
+  {
+    "path": "design-kit/ui/screens/11-ice.png",
+    "bytes": 537779,
+    "sha256": "b4b15eb39f80bcc2a9a76939cd303ab43be45bb84a24bc47c5dfbdc0b2b852fc"
+  },
+  {
+    "path": "design-kit/ui/screens/10-paper-target.png",
+    "bytes": 590760,
+    "sha256": "2ee63c2f7b9dd0cfb0ff2004dfe36f6a928cf05903df8c3bd4b9ff4dfbe3d7e8"
+  },
+  {
+    "path": "design-kit/ui/screens/28-real-support.png",
+    "bytes": 371111,
+    "sha256": "73de46f86499dd6ee0e4dbc0822636e213decab60e48a39105c70e23ea2fa199"
+  },
+  {
+    "path": "design-kit/ui/screens/20-no-relief.png",
+    "bytes": 387143,
+    "sha256": "615076764e1020ceb8abcc0e252df020feacd3a82b19a63ac58c48143f468b2c"
+  },
+  {
+    "path": "design-kit/assets/props/paper-plane.png",
+    "bytes": 118094,
+    "sha256": "5c4e3ebf5e462bddb4f9faf66b3d924e2c5b900eba5238e8147a1408a87b0bb8"
+  },
+  {
+    "path": "design-kit/assets/props/ice-cracked.png",
+    "bytes": 244515,
+    "sha256": "0ddc61491787c7a7fb229a94e09b861dde9c97e3d75b3dda85a7ed6f636863a8"
+  },
+  {
+    "path": "design-kit/assets/props/envelope.png",
+    "bytes": 177864,
+    "sha256": "36c468afeecb1f6df163e6a33bf65432de877085bbbd2769927f8ed0b5b9ccef"
+  },
+  {
+    "path": "design-kit/assets/props/ice-intact.png",
+    "bytes": 218155,
+    "sha256": "5f9160c3d90d4b54e21b72fa0830acd2eb915bc8ce60a20cf1332a5e81bc1928"
+  },
+  {
+    "path": "design-kit/assets/props/paper-ball.png",
+    "bytes": 181669,
+    "sha256": "003dca55a8b3b0c7ade57a82b71f41613255ecf9acb106250a1d49717048fa21"
+  },
+  {
+    "path": "design-kit/assets/props/toilet.png",
+    "bytes": 211024,
+    "sha256": "f17005af1fed749a9fc6d2b97a11fbdfd2cb191a123b42874960f8473f0fbe41"
+  },
+  {
+    "path": "design-kit/assets/props/water-vortex.png",
+    "bytes": 224123,
+    "sha256": "8a69a31654522990bcfc8dc4d32e8438b51486d7b4ac39e9a8046ebfea87469c"
+  },
+  {
+    "path": "design-kit/assets/props/paper-target.png",
+    "bytes": 180085,
+    "sha256": "a042f4735d16c64feb7fed69b711c30793bd2cea9551c869c36f3768680b3aa7"
+  },
+  {
+    "path": "design-kit/assets/scenes/home-river-hero.png",
+    "bytes": 589788,
+    "sha256": "48694417561610989bca2262a9ed87274c6f401a195ec62dbe12f3aa612ae85b"
+  },
+  {
+    "path": "design-kit/assets/brand/logo-mark.png",
+    "bytes": 305223,
+    "sha256": "03181ed7ca9b5f77c96c617bf3c51a4c8adc2307ad20cbf668b2082f2c567aac"
+  },
+  {
+    "path": "design-kit/assets/brand/logo-horizontal.png",
+    "bytes": 498507,
+    "sha256": "d5633d21e9ed63cd5f0927c49fe8dff6872d9c59c1a33f407916797794313886"
+  },
+  {
+    "path": "design-kit/assets/brand/logo-wordmark.png",
+    "bytes": 179415,
+    "sha256": "33374f636d5969fb424ad50500fb51ac294dec816ea79a23f90e689b29de027b"
+  },
+  {
+    "path": "design-kit/assets/brand/logo-mark-512.png",
+    "bytes": 143994,
+    "sha256": "b67124473f324d5e4659dcf6cbbb15ae10dd5f8c78d6551a7ec21ac4b1e47715"
+  },
+  {
+    "path": "design-kit/assets/ip/actions/listen.png",
+    "bytes": 144494,
+    "sha256": "eb6d5dd11a4b1ec47a5fd1a8b3caff815322de409fa8e41fac642eeda0ab6b6e"
+  },
+  {
+    "path": "design-kit/assets/ip/actions/wave.png",
+    "bytes": 142622,
+    "sha256": "4c2953d1561e5833c4b74ba9cf101aaec9cb0b0a8d85925848ff19bed3e5f58e"
+  },
+  {
+    "path": "design-kit/assets/ip/actions/hold-note.png",
+    "bytes": 146816,
+    "sha256": "7777f859d2735bbbf5cb2ef5e5417759e77b0919ee38a561f87b3808278fdf03"
+  },
+  {
+    "path": "design-kit/assets/ip/actions/nod.png",
+    "bytes": 139639,
+    "sha256": "17a7e58c0ee067a948bc92b93fd5f906781d185de9c5f08b6d89196cba62f827"
+  },
+  {
+    "path": "design-kit/assets/ip/actions/crumple.png",
+    "bytes": 141523,
+    "sha256": "7dd6907796d02f764b6fd0988c4460d372489b5923d055e44556f76eae9ecfdd"
+  },
+  {
+    "path": "design-kit/assets/ip/actions/stretch.png",
+    "bytes": 145205,
+    "sha256": "9d41f739f8dd8f29d11fc6c52e7bf486c7fb4d4573c762c80f2f50133d6ea3f3"
+  },
+  {
+    "path": "design-kit/assets/ip/actions/throw.png",
+    "bytes": 153852,
+    "sha256": "176828b13710a8f8d225d356174ace019004e8498f50d54daed825cb433f92e0"
+  },
+  {
+    "path": "design-kit/assets/ip/actions/gentle-shake.png",
+    "bytes": 150161,
+    "sha256": "5fd25afacabdf067acbb3c54a10c2172394469bd5486c869e268b79cba9e0eb8"
+  },
+  {
+    "path": "design-kit/assets/ip/emotions/frustrated.png",
+    "bytes": 211905,
+    "sha256": "c6ad5c852a4f93a71f5bdfe0a9fa5e7a400d4a85bdf0a648a013616dc233c4da"
+  },
+  {
+    "path": "design-kit/assets/ip/emotions/happy.png",
+    "bytes": 210799,
+    "sha256": "aa36324c8409fad24a7879b9ee330dbd44e89e9c23aa7fb5f35efd269d6bbf5b"
+  },
+  {
+    "path": "design-kit/assets/ip/emotions/sad.png",
+    "bytes": 208117,
+    "sha256": "eb378aa6811a9fc225ba8288b8d782720489029509fe4063f0063c09a3afd701"
+  },
+  {
+    "path": "design-kit/assets/ip/emotions/thoughtful.png",
+    "bytes": 208902,
+    "sha256": "ecebd3a7266911bbffad91746d8697403377aa10039c220a1fbfad17dfbf2c72"
+  },
+  {
+    "path": "design-kit/assets/ip/emotions/calm.png",
+    "bytes": 208383,
+    "sha256": "820ef254f3e3857031ad8c287ff0a4f63768e85597e986afab37957217bd6c50"
+  },
+  {
+    "path": "design-kit/assets/ip/emotions/relieved.png",
+    "bytes": 218172,
+    "sha256": "e6977bd6b9c9ef36ea81d16c1144bb8e5048322deb4c3fb2065e896e73b72a12"
+  },
+  {
+    "path": "design-kit/assets/ip/emotions/tired.png",
+    "bytes": 209339,
+    "sha256": "efee23cc9a37c69ddbe7fe013a7932bce40cc7e4883a5a0224af50705ef6e50d"
+  },
+  {
+    "path": "design-kit/assets/ip/emotions/surprised.png",
+    "bytes": 218731,
+    "sha256": "e72e6a782a2b0ef49ffda03bec97ede6d4935c9b3db62ce45db6d24edbb4e28d"
+  }
+]
