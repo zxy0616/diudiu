@@ -1,5 +1,6 @@
 import {invokeAI,getSession,signIn,signOut} from './ai-client.js';
 import {RequestGate,textPayload} from './request-gate.js';
+import {suggestSearchQuery} from './search-ui.js';
 
 export function createAIFlow({state,modal,closeModal,render,nav,toast,btn,esc,image,captureDraft}) {
   const gate=new RequestGate();
@@ -14,24 +15,26 @@ export function createAIFlow({state,modal,closeModal,render,nav,toast,btn,esc,im
   async function request(action){
     captureDraft();
     state.aiAction=action;
-    const payload={...textPayload(state.messages,state.context),action,intent:state.intent,finishRequested:action==='summarize'};
+    if(!state.queryEdited)state.query=suggestSearchQuery(state.messages,state.intent);
+    const payload={...textPayload(state.messages,state.context),action,intent:state.intent,finishRequested:action==='summarize',search:{enabled:action==='respond'&&state.search===true,query:state.query,scope:state.searchScope||'social'}};
     if(!payload.messages.length){state.aiStatus='error';state.aiError='目前只有图片或录音，还没有可供 AI 处理的文字。可以补充文字，或自己写一句重点。';render();return;}
     if(state.intent==='collect'&&action!=='summarize')return;
-    if(!state.aiConsent){state.pendingAI=action;modal(`<h2>把这些文字说给丢丢听？</h2><p>本次已发送的文字，以及你主动选用的背景，将由腾讯云云函数转交模型服务处理。</p><p>图片和录音仍留在本地，不会上传。本应用不把对话存入云端数据库；云平台和模型服务可能按各自规则保留处理记录。</p>${btn('同意发送文字，继续','ai-consent')}${btn('先不联网','close-dialog','secondary')}`);return;}
-    const token=gate.start();state.aiStatus='loading';state.aiError='';render();
+    if(!state.aiConsent){state.pendingAI=action;modal(`<h2>把这些文字说给丢丢听？</h2><p>本次已发送的文字，以及你主动选用的背景，将由腾讯云云函数转交模型服务处理。</p><label class="setting"><span>共鸣/建议时，允许搜索公开网络</span><input id="ai-allow-search" type="checkbox" checked></label><label for="ai-search-query">检索词，可以改成自己的通用说法</label><input id="ai-search-query" class="source-query" maxlength="80" value="${esc(state.query)}"><p class="small">搜索服务只收到检索词；请勿填写姓名、单位、电话或聊天原话。优先查找社交平台已收录的公开页面，结果不足时扩大到公开网页。先说完和烦恼提炼都不检索。</p><p>图片和录音仍留在本地，不会上传。云平台、模型与搜索服务可能按各自规则保留处理记录。</p>${btn('同意发送文字，继续','ai-consent')}${btn('先不联网','close-dialog','secondary')}`);return;}
+    const token=gate.start();state.aiStatus='loading';state.aiError='';state.aiSources=[];state.searchResult=null;render();
     try{
       const session=await getSession();if(!token.isCurrent())return;
       if(!session){state.aiStatus='error';state.aiError='请先登录，再使用在线 AI。';state.pendingAI=action;render();loginDialog();return;}
       const result=await invokeAI(payload);if(!token.isCurrent())return;
       captureDraft();state.aiStatus='done';
       if(action==='summarize'){state.summary={event:result.event,label:result.label};state.target=result.label;state.targetConfirmed=false;}
-      else{state.aiReply=result.text;}
+      else{state.aiReply=result.text;state.aiSources=Array.isArray(result.sources)?result.sources:[];state.searchResult=result.search||{status:'disabled'};}
       render();
     }catch(error){if(!token.isCurrent())return;captureDraft();state.aiStatus='error';state.aiError=error.message||'在线服务暂时不可用，可以重试或先自己写。';render();}
   }
   async function action(name,el){
     switch(name){
-    case 'ai-consent':{const next=state.pendingAI||state.aiAction;state.aiConsent=true;closeModal();await request(next);return true;}
+    case 'ai-consent':{const next=state.pendingAI||state.aiAction;state.search=!!document.querySelector('#ai-allow-search')?.checked;const query=document.querySelector('#ai-search-query')?.value.trim()||'';state.queryEdited=query!==suggestSearchQuery(state.messages,state.intent);state.query=query;state.aiConsent=true;closeModal();await request(next);return true;}
+    case 'ai-search-respond':{state.query=document.querySelector('#query').value.trim();state.queryEdited=true;state.search=!!document.querySelector('#search-toggle').checked;state.searchScope=document.querySelector('#search-scope').value;if(state.search&&!state.query){toast('先写一个不含身份信息的通用检索词。');return true;}if(state.intent==='collect'){toast('先说完期间不检索，准备好后可选择共鸣或建议。');return true;}nav('conversation');await request('respond');return true;}
     case 'ai-show-login':loginDialog();return true;
     case 'ai-login':{
       const user=document.querySelector('#ai-username').value.trim();const password=document.querySelector('#ai-password').value;

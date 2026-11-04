@@ -5,3 +5,5 @@
 @media(min-width:600px){body{padding:24px 0}.app{border-radius:28px;min-height:844px}.page{min-height:844px}.home-draft{min-height:170px}.game-stage{height:410px}}
 @media(max-width:359px){.intro h1{font-size:31px}.intro p{font-size:15px}.home-listen{font-size:21px}.release-entry{grid-template-columns:50px 1fr 24px}.release-entry strong{font-size:19px}.release-entry small{font-size:13px}.tools{gap:6px}.game-stage{height:340px}.game-menu .choice>img{width:96px}.content{padding-inline:16px}.object-label{font-size:18px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+
+.source-box{overflow-wrap:anywhere}.source-box>*+*{margin-top:8px}.source-box a{display:block;font-weight:650}.source-query{min-width:0;max-width:100%}dialog label.setting span{flex:1}
