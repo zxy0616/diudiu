@@ -1,6 +1,6 @@
 import {listStories,getStory,hydrateStory,saveStory,deleteStory,clearStories,snapshotStory,filterStories} from './basket-store.js';
 import {cleanTags} from './conversation-tools.js';
-export function createBasketFlow({state,nav,render,modal,closeModal,toast,btn,esc,image,clearSession,captureDraft}){
+export function createBasketFlow({state,nav,render,modal,closeModal,toast,btn,esc,image,clearSession,captureDraft,ensureLogin}){
   let records=[],loading=false,loadError='',detail=null,selectedTags=[],saveBusy=false;
   const date=t=>new Date(t).toLocaleDateString('zh-CN',{month:'short',day:'numeric'});
   function releaseDetail(){if(detail){for(const m of detail.messages){for(const img of m.images||[])URL.revokeObjectURL(img.url);if(m.audio)URL.revokeObjectURL(m.audio.url);}detail=null;}}
@@ -29,6 +29,7 @@ export function createBasketFlow({state,nav,render,modal,closeModal,toast,btn,es
   }
   function offerLeave(){captureDraft();const hasDraft=state.draft.trim()||state.attachments.length||state.audio;if((!state.messages.length&&!hasDraft)||(!state.storyDirty&&state.archiveId&&!hasDraft)){clearSession();nav('home');return;}modal(`<h2>这次的话，要留下来吗？</h2><p>放进小纸篓，下次就能接着说。也可以让它随着今天过去。</p>${btn('放进小纸篓','basket-save')}${btn('不保存，回到首页','basket-discard','secondary')}${btn('再留一会儿','close-dialog','link')}`);}
   async function continueRecord(id){
+    if(!await ensureLogin(()=>continueRecord(id)))return;
     try{const source=await getStory(id);if(!source){toast('这团话已经不在了。');return;}const story=await hydrateStory(source);clearSession();Object.assign(state,{messages:story.messages,summary:story.summary,intent:story.intent,context:story.context,selectedFocusIds:story.selectedFocusIds||[],savedFocuses:story.focuses||[],focuses:story.focuses||[],archiveId:story.id,storyTitle:story.title,storyCreatedAt:story.createdAt,autoTags:story.tags,savedTags:story.tags,storyDirty:false,saved:true});const last=story.messages.filter(m=>m.role==='assistant').at(-1);state.aiReply=last?.text||'';state.aiSources=last?.sources||[];state.searchResult=last?.search||null;state.aiStatus=last?'done':'idle';nav('conversation');toast('丢丢在，接着说吧。');}catch(e){toast(e.message);}
   }
   async function clearAll(){try{await clearStories();records=[];releaseDetail();state.archiveId=null;state.saved=false;return true;}catch(e){toast(e.message);return false;}}
@@ -37,7 +38,7 @@ export function createBasketFlow({state,nav,render,modal,closeModal,toast,btn,es
       case 'basket-show':await show();break;
       case 'basket-open':await openRecord(el.dataset.id);break;
       case 'basket-tag':state.basketTag=el.dataset.tag;render();break;
-      case 'basket-new':clearSession();nav('input');break;
+      case 'basket-new':{const begin=()=>{clearSession();nav('input');};if(await ensureLogin(begin))begin();break;}
       case 'basket-save':saveDialog();break;
       case 'basket-save-confirm':await save();break;
       case 'basket-remove-tag':selectedTags=selectedTags.filter(t=>t!==el.dataset.tag);el.remove();break;

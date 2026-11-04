@@ -3,8 +3,18 @@ import {RequestGate,textPayload} from './request-gate.js';
 import {summaryOptions} from './conversation-tools.js';
 export function createAIFlow({state,modal,closeModal,render,nav,toast,btn,esc,captureDraft}) {
   const gate=new RequestGate();
+  let entryVersion=0,afterLogin=null;
+  function dismissLogin(){entryVersion++;afterLogin=null;}
+  async function ensureLogin(next){
+    const version=++entryVersion;
+    try{
+      const session=await getSession();if(version!==entryVersion)return false;
+      if(session){const changed=!state.authenticated;state.authenticated=true;if(changed){captureDraft();render();}return true;}
+      state.authenticated=false;captureDraft();render();loginDialog(next);return false;
+    }catch{if(version!==entryVersion)return false;state.authenticated=false;captureDraft();render();loginDialog(next);document.querySelector('#ai-login-error').textContent='暂时没能连接上，稍后再试一下吧。';return false;}
+  }
   function cancel(){gate.cancel();if(state.aiStatus==='loading')state.aiStatus='idle';state.pendingAI=null;}
-  function loginDialog(){modal(`<h2>丢丢在这儿，等你回来</h2><p class="small">登录后，就可以接着聊了。</p><label for="ai-username">账号</label><input id="ai-username" class="source-query" autocomplete="username" maxlength="100"><label for="ai-password">密码</label><input id="ai-password" class="source-query" type="password" autocomplete="current-password" maxlength="200"><p id="ai-login-error" class="error" role="alert"></p>${btn('登录并继续','ai-login')}${btn('先不登录','close-dialog','secondary')}`);}
+  function loginDialog(next=null){afterLogin=next;modal(`<h2>开始前，先登录一下</h2><p class="small">登录好，再慢慢说。想留下的话，仍由你主动放进小纸篓。</p><label for="ai-username">账号</label><input id="ai-username" class="source-query" autocomplete="username" maxlength="100"><label for="ai-password">密码</label><input id="ai-password" class="source-query" type="password" autocomplete="current-password" maxlength="200"><p id="ai-login-error" class="error" role="alert"></p>${btn('登录并继续','ai-login')}${btn('先看看','close-dialog','secondary')}`);}
   function friendly(error){return {AUTH_REQUIRED:'先登录一下，丢丢就能接着听你说。',AUTH_ERROR:'账号或密码没对上，再检查一下吧。',TIMEOUT:'等得有点久了，可以再试一下。',RATE_LIMIT:'先缓一小会儿，再接着聊。',INVALID_RESPONSE:'这次没整理清楚，可以再试一下，或按你的意思写。',NOT_CONFIGURED:'丢丢这会儿还没准备好，过一会儿再来试试。'}[error?.code]||'这会儿没能回应上，你写的话还在，可以再试一下。';}
   function statusBlock(action){
     if(state.aiStatus==='loading')return `<div class="listening-feedback" role="status"><p>丢丢正在${action==='summarize'?'整理你的烦恼':'认真听你说'}…</p>${btn('先不等了','ai-stop','link')}</div>`;
@@ -21,7 +31,7 @@ export function createAIFlow({state,modal,closeModal,render,nav,toast,btn,esc,ca
     const token=gate.start();if(action==='respond')state.aiReply='';state.aiStatus='loading';state.aiError='';state.aiSources=[];state.searchResult=null;render();
     try{
       const session=await getSession();if(!token.isCurrent())return;
-      if(!session){state.aiStatus='error';state.aiError='先登录一下，丢丢就能接着听你说。';state.pendingAI=action;render();loginDialog();return;}
+      if(!session){state.authenticated=false;state.aiStatus='error';state.aiError='登录已结束，你写的话还在。重新登录后可以接着说。';state.pendingAI=action;render();return;}
       const result=await invokeAI(payload);if(!token.isCurrent())return;
       captureDraft();state.aiStatus='done';state.storyDirty=true;
       if(action==='summarize'){
@@ -41,17 +51,18 @@ export function createAIFlow({state,modal,closeModal,render,nav,toast,btn,esc,ca
     case 'ai-login':{
       const user=document.querySelector('#ai-username').value.trim(),password=document.querySelector('#ai-password').value;
       const error=document.querySelector('#ai-login-error');if(!user||!password){error.textContent='把账号和密码都填好吧。';return true;}
+      const passwordField=document.querySelector('#ai-password');
       el.disabled=true;
-      try{await signIn(user,password);if(!document.querySelector('#ai-password'))return true;document.querySelector('#ai-password').value='';closeModal();toast('回来啦。');if(['conversation','summary'].includes(state.route)&&state.aiConsent)await request(state.pendingAI||state.aiAction);}
+      try{await signIn(user,password);state.authenticated=true;if(document.querySelector('#ai-password')!==passwordField)return true;passwordField.value='';const next=afterLogin;afterLogin=null;closeModal();captureDraft();render();toast('回来啦。');if(next)await next();else if(['conversation','summary'].includes(state.route)&&state.aiConsent)await request(state.pendingAI||state.aiAction);}
       catch(e){if(document.querySelector('#ai-login-error'))document.querySelector('#ai-login-error').textContent=friendly(e);}
       finally{el.disabled=false;}return true;
     }
-    case 'ai-signout':try{await signOut();cancel();state.aiReply='';toast('已退出，下次见。');render();}catch{toast('这次没退出成功，再试一下吧。');}return true;
+    case 'ai-signout':try{await signOut();cancel();dismissLogin();state.authenticated=false;state.aiReply='';toast('已退出，下次见。');render();}catch{toast('这次没退出成功，再试一下吧。');}return true;
     case 'ai-retry':await request(state.aiAction);return true;
     case 'ai-stop':cancel();state.aiStatus='idle';render();return true;
     default:return false;
     }
   }
-  window.addEventListener('diudiu-signed-out',()=>{cancel();state.aiReply='';if(state.intent!=='collect'){state.aiStatus='error';state.aiError='登录结束了，再登录一下就好。';}render();});
-  return {request,cancel,action,statusBlock};
+  window.addEventListener('diudiu-signed-out',()=>{cancel();dismissLogin();state.authenticated=false;state.aiReply='';if(state.intent!=='collect'){state.aiStatus='error';state.aiError='登录结束了，再登录一下就好。';}captureDraft();render();});
+  return {request,cancel,action,statusBlock,ensureLogin,dismissLogin};
 }

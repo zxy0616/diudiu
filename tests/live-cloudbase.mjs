@@ -20,8 +20,8 @@ try{
     await page.getByText('确定访问',{exact:false}).click();
     await page.locator('[data-action="privacy"]').last().waitFor();
   }
-  await page.locator('[data-action="privacy"]').last().click();
-  await page.locator('[data-action="ai-show-login"]').click();
+  // Login is offered on arrival, before any text or conversation is entered.
+  await page.locator('#ai-username').waitFor();
   await page.locator('#ai-username').fill(account.username);
   await page.locator('#ai-password').fill(account.password);
   await page.locator('[data-action="ai-login"]').click();
@@ -31,6 +31,11 @@ try{
   assert.equal(status.ok,true);
   assert.deepEqual(errors,[]);
   console.log(JSON.stringify({applicationLogin:'passed',functionRoundTrip:'passed',modelConfigured:status.configured,liveModelTest:'not run'}));
+  await page.reload({waitUntil:'networkidle'});
+  await page.locator('#draft:not([readonly])').waitFor({timeout:20000});
+  assert.equal(await page.locator('dialog[open] #ai-password').count(),0);
+  console.log(JSON.stringify({loginAtArrival:'passed',retainedLoginAfterReload:'passed'}));
+  await page.locator('[data-action="privacy"]').last().click();
   if(process.env.RUN_LIVE_BASKET_UI==='1') {
     await page.locator('[data-action="back"]').click();
     await page.locator('#draft').fill('虚构联调：为什么找不到工作？投了很多简历却没回音，我有点迷茫，也不知道该怎么调整。');

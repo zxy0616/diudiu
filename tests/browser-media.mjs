@@ -1,10 +1,12 @@
 import { createRequire } from 'node:module';
 import assert from 'node:assert/strict';
+import {installAIFixture} from './helpers/ai-fixture.mjs';
 const require=createRequire(import.meta.url);
 const { chromium }=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const browser=await chromium.launch({headless:true,args:['--use-fake-device-for-media-stream','--use-fake-ui-for-media-stream'],...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
 const context=await browser.newContext({viewport:{width:390,height:844},permissions:['microphone']});
 const page=await context.newPage();
+await installAIFixture(page);
 const errors=[];page.on('pageerror',e=>errors.push(e.message));
 const click=a=>page.locator(`[data-action="${a}"]`).last().click();
 try{
