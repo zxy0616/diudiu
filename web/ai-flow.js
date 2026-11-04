@@ -1,55 +1,57 @@
 import {invokeAI,getSession,signIn,signOut} from './ai-client.js';
 import {RequestGate,textPayload} from './request-gate.js';
-import {suggestSearchQuery} from './search-ui.js';
-
-export function createAIFlow({state,modal,closeModal,render,nav,toast,btn,esc,image,captureDraft}) {
+import {summaryOptions} from './conversation-tools.js';
+export function createAIFlow({state,modal,closeModal,render,nav,toast,btn,esc,captureDraft}) {
   const gate=new RequestGate();
   function cancel(){gate.cancel();if(state.aiStatus==='loading')state.aiStatus='idle';state.pendingAI=null;}
-  function loginDialog(){modal(`<h2>登录后，继续说</h2><p class="small">使用此应用的 CloudBase 账号。账号由应用管理员创建；腾讯云控制台账号不能直接用于这里。</p><label for="ai-username">应用账号</label><input id="ai-username" class="source-query" autocomplete="username" maxlength="100"><label for="ai-password">密码</label><input id="ai-password" class="source-query" type="password" autocomplete="current-password" maxlength="200"><p id="ai-login-error" class="error" role="alert"></p>${btn('登录并继续','ai-login')}${btn('先不登录','close-dialog','secondary')}`);}
+  function loginDialog(){modal(`<h2>丢丢在这儿，等你回来</h2><p class="small">登录后，就可以接着聊了。</p><label for="ai-username">账号</label><input id="ai-username" class="source-query" autocomplete="username" maxlength="100"><label for="ai-password">密码</label><input id="ai-password" class="source-query" type="password" autocomplete="current-password" maxlength="200"><p id="ai-login-error" class="error" role="alert"></p>${btn('登录并继续','ai-login')}${btn('先不登录','close-dialog','secondary')}`);}
+  function friendly(error){return {AUTH_REQUIRED:'先登录一下，丢丢就能接着听你说。',AUTH_ERROR:'账号或密码没对上，再检查一下吧。',TIMEOUT:'等得有点久了，可以再试一下。',RATE_LIMIT:'先缓一小会儿，再接着聊。',INVALID_RESPONSE:'这次没整理清楚，可以再试一下，或按你的意思写。',NOT_CONFIGURED:'丢丢这会儿还没准备好，过一会儿再来试试。'}[error?.code]||'这会儿没能回应上，你写的话还在，可以再试一下。';}
   function statusBlock(action){
-    if(state.aiStatus==='loading')return `<div class="soft" role="status">丢丢正在${action==='summarize'?'整理你说的这些':'认真想一想'}…${btn('停止等待','ai-stop','link')}<p class="small">停止等待后，后到的结果不会显示。</p></div>`;
-    if(state.aiStatus==='error')return `<div class="panel"><p class="error" role="alert">${esc(state.aiError)}</p>${btn('再试一次','ai-retry','secondary')}${btn('登录应用账号','ai-show-login','link')}</div>`;
-    if(state.aiStatus==='idle'&&!state.aiReply)return `<div class="panel"><p class="small">${action==='summarize'?'准备好时，再整理你说的这些。':'想要回应时，再叫丢丢。'}</p>${btn(action==='summarize'?'整理这次最烦的点':'让丢丢回应','ai-retry','secondary')}</div>`;
+    if(state.aiStatus==='loading')return `<div class="listening-feedback" role="status"><p>丢丢正在${action==='summarize'?'整理你的烦恼':'认真听你说'}…</p>${btn('先不等了','ai-stop','link')}</div>`;
+    if(state.aiStatus==='error')return `<div class="panel"><p class="error" role="alert">${esc(state.aiError)}</p>${btn('再试一次','ai-retry','secondary')}${btn('登录一下','ai-show-login','link')}</div>`;
+    if(state.aiStatus==='idle'&&(action==='summarize'?!state.summary:!state.aiReply))return `<div class="listening-feedback"><p class="small">${action==='summarize'?'准备好了，就一起理一理。':'丢丢在这儿。'}</p>${btn(action==='summarize'?'一起理一理':'听听丢丢怎么说','ai-retry','link')}</div>`;
     return '';
   }
   async function request(action){
-    captureDraft();
-    state.aiAction=action;
-    if(!state.queryEdited)state.query=suggestSearchQuery(state.messages,state.intent);
-    const payload={...textPayload(state.messages,state.context),action,intent:state.intent,finishRequested:action==='summarize',search:{enabled:action==='respond'&&state.search===true,query:state.query,scope:state.searchScope||'social'}};
-    if(!payload.messages.length){state.aiStatus='error';state.aiError='目前只有图片或录音，还没有可供 AI 处理的文字。可以补充文字，或自己写一句重点。';render();return;}
     if(state.intent==='collect'&&action!=='summarize')return;
-    if(!state.aiConsent){state.pendingAI=action;modal(`<h2>把这些文字说给丢丢听？</h2><p>本次已发送的文字，以及你主动选用的背景，将由腾讯云云函数转交模型服务处理。</p><label class="setting"><span>共鸣/建议时，允许搜索公开网络</span><input id="ai-allow-search" type="checkbox" checked></label><label for="ai-search-query">检索词，可以改成自己的通用说法</label><input id="ai-search-query" class="source-query" maxlength="80" value="${esc(state.query)}"><p class="small">搜索服务只收到检索词；请勿填写姓名、单位、电话或聊天原话。优先查找社交平台已收录的公开页面，结果不足时扩大到公开网页。先说完和烦恼提炼都不检索。</p><p>图片和录音仍留在本地，不会上传。云平台、模型与搜索服务可能按各自规则保留处理记录。</p>${btn('同意发送文字，继续','ai-consent')}${btn('先不联网','close-dialog','secondary')}`);return;}
-    const token=gate.start();state.aiStatus='loading';state.aiError='';state.aiSources=[];state.searchResult=null;render();
+    captureDraft();state.aiAction=action;
+    const payload={...textPayload(state.messages,state.context),action,intent:state.intent,finishRequested:action==='summarize',search:{enabled:action==='respond'&&state.search===true,scope:state.searchScope||'social'}};
+    if(!payload.messages.some(m=>m.role==='user')){state.aiStatus='error';state.aiError='也写一句图片或录音里想说的话吧，丢丢想听懂你。';render();return;}
+    if(!state.aiConsent){state.pendingAI=action;modal(`<h2>让丢丢听听，好吗？</h2><p>为了回应你，丢丢需要联网读你发来的文字。图片和录音先留在这台设备；想留下这次聊天时，再由你决定保存。</p><label class="setting"><span>也帮我找找相似的经历</span><input id="ai-allow-search" type="checkbox" checked></label><p class="small">只用不带身份信息的主题词找参考。你安静说的时候，丢丢只听着。</p>${btn('好，说给丢丢听','ai-consent')}${btn('先不联网','close-dialog','secondary')}`);return;}
+    const token=gate.start();if(action==='respond')state.aiReply='';state.aiStatus='loading';state.aiError='';state.aiSources=[];state.searchResult=null;render();
     try{
       const session=await getSession();if(!token.isCurrent())return;
-      if(!session){state.aiStatus='error';state.aiError='请先登录，再使用在线 AI。';state.pendingAI=action;render();loginDialog();return;}
+      if(!session){state.aiStatus='error';state.aiError='先登录一下，丢丢就能接着听你说。';state.pendingAI=action;render();loginDialog();return;}
       const result=await invokeAI(payload);if(!token.isCurrent())return;
-      captureDraft();state.aiStatus='done';
-      if(action==='summarize'){state.summary={event:result.event,label:result.label};state.target=result.label;state.targetConfirmed=false;}
-      else{state.aiReply=result.text;state.aiSources=Array.isArray(result.sources)?result.sources:[];state.searchResult=result.search||{status:'disabled'};}
+      captureDraft();state.aiStatus='done';state.storyDirty=true;
+      if(action==='summarize'){
+        state.summary={event:result.event,label:result.label,options:summaryOptions(result),tags:result.tags||[],title:result.title||''};state.selectedFocusIds=[];state.target='';state.targetConfirmed=false;state.autoTags=result.tags||[];if(!state.archiveId)state.storyTitle=result.title||'';
+      }else{
+        state.aiReply=result.text;state.aiSources=Array.isArray(result.sources)?result.sources:[];state.searchResult=result.search||{status:'disabled'};state.autoTags=result.tags||[];if(!state.archiveId)state.storyTitle=result.title||'';
+        state.messages.push({role:'assistant',text:result.text,images:[],audio:null,sources:state.aiSources,search:state.searchResult});
+      }
       render();
-    }catch(error){if(!token.isCurrent())return;captureDraft();state.aiStatus='error';state.aiError=error.message||'在线服务暂时不可用，可以重试或先自己写。';render();}
+    }catch(error){if(!token.isCurrent())return;captureDraft();state.aiStatus='error';state.aiError=friendly(error);render();}
   }
   async function action(name,el){
     switch(name){
-    case 'ai-consent':{const next=state.pendingAI||state.aiAction;state.search=!!document.querySelector('#ai-allow-search')?.checked;const query=document.querySelector('#ai-search-query')?.value.trim()||'';state.queryEdited=query!==suggestSearchQuery(state.messages,state.intent);state.query=query;state.aiConsent=true;closeModal();await request(next);return true;}
-    case 'ai-search-respond':{state.query=document.querySelector('#query').value.trim();state.queryEdited=true;state.search=!!document.querySelector('#search-toggle').checked;state.searchScope=document.querySelector('#search-scope').value;if(state.search&&!state.query){toast('先写一个不含身份信息的通用检索词。');return true;}if(state.intent==='collect'){toast('先说完期间不检索，准备好后可选择共鸣或建议。');return true;}nav('conversation');await request('respond');return true;}
+    case 'ai-consent':{const next=state.pendingAI||state.aiAction;state.search=!!document.querySelector('#ai-allow-search')?.checked;state.aiConsent=true;closeModal();await request(next);return true;}
+    case 'ai-search-respond':{state.search=!!document.querySelector('#search-toggle')?.checked;if(state.intent==='collect'){toast('先慢慢说，丢丢听着。');return true;}nav('conversation');await request('respond');return true;}
     case 'ai-show-login':loginDialog();return true;
     case 'ai-login':{
-      const user=document.querySelector('#ai-username').value.trim();const password=document.querySelector('#ai-password').value;
-      const error=document.querySelector('#ai-login-error');if(!user||!password){error.textContent='请填写应用账号和密码。';return true;}
+      const user=document.querySelector('#ai-username').value.trim(),password=document.querySelector('#ai-password').value;
+      const error=document.querySelector('#ai-login-error');if(!user||!password){error.textContent='把账号和密码都填好吧。';return true;}
       el.disabled=true;
-      try{await signIn(user,password);if(!document.querySelector('#ai-password'))return true;document.querySelector('#ai-password').value='';closeModal();toast('已登录。');if(['conversation','summary'].includes(state.route)&&state.aiConsent)await request(state.pendingAI||state.aiAction);}
-      catch(e){if(document.querySelector('#ai-login-error'))document.querySelector('#ai-login-error').textContent=e.message;}
+      try{await signIn(user,password);if(!document.querySelector('#ai-password'))return true;document.querySelector('#ai-password').value='';closeModal();toast('回来啦。');if(['conversation','summary'].includes(state.route)&&state.aiConsent)await request(state.pendingAI||state.aiAction);}
+      catch(e){if(document.querySelector('#ai-login-error'))document.querySelector('#ai-login-error').textContent=friendly(e);}
       finally{el.disabled=false;}return true;
     }
-    case 'ai-signout':try{await signOut();cancel();state.aiReply='';toast('已退出应用账号。');render();}catch(e){toast(e.message);}return true;
+    case 'ai-signout':try{await signOut();cancel();state.aiReply='';toast('已退出，下次见。');render();}catch{toast('这次没退出成功，再试一下吧。');}return true;
     case 'ai-retry':await request(state.aiAction);return true;
-    case 'ai-stop':cancel();state.aiStatus='idle';render();toast('已停止等待，后到的结果不会显示。');return true;
+    case 'ai-stop':cancel();state.aiStatus='idle';render();return true;
     default:return false;
     }
   }
-  window.addEventListener('diudiu-signed-out',()=>{cancel();state.aiReply='';if(state.intent!=='collect'){state.aiStatus='error';state.aiError='登录状态已结束，请重新登录。';}render();});
+  window.addEventListener('diudiu-signed-out',()=>{cancel();state.aiReply='';if(state.intent!=='collect'){state.aiStatus='error';state.aiError='登录结束了，再登录一下就好。';}render();});
   return {request,cancel,action,statusBlock};
 }

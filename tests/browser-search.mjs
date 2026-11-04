@@ -16,20 +16,19 @@ try{
   await page.locator('#draft').fill('张三在某公司改了三次方案，电话13800138000。');
   await click('start');await click('accept-start');await click('send');await click('empathize');
   assert.equal(calls.length,0);
-  const query=await page.locator('#ai-search-query').inputValue();assert.ok(!/张三|某公司|138/.test(query));
-  await page.locator('#ai-search-query').fill('工作反复修改 相似经历');await click('ai-consent');
+  assert.equal(await page.locator('#ai-search-query').count(),0);await click('ai-consent');
   await page.locator('[data-message="assistant"]').waitFor();
-  assert.equal(calls[0].search.enabled,true);assert.equal(calls[0].search.query,'工作反复修改 相似经历');
+  assert.equal(calls[0].search.enabled,true);assert.equal(calls[0].search.query,undefined);
   await click('sources');
   assert.equal(await page.locator('.source-box a').count(),1);assert.equal(await page.locator('.source-box img').count(),0);
   assert.equal(await page.locator('.source-box a').getAttribute('href'),'https://example.com/fixture');
-  assert.ok(await page.getByText('社交平台公开结果不足，已扩大到公开网页。',{exact:false}).count());
-  await page.locator('#search-toggle').uncheck();await click('ai-search-respond');await page.locator('[data-message="assistant"]').waitFor();
+  assert.equal(await page.locator('#query,#search-scope').count(),0);assert.ok(!(await page.locator('body').innerText()).includes('检索'));
+  await page.locator('#search-toggle').uncheck();await click('ai-search-respond');await page.waitForFunction(()=>document.querySelectorAll('[data-message="assistant"]').length===2);
   assert.equal(calls.at(-1).search.enabled,false);
   await click('sources');assert.equal(await page.locator('.source-box a').count(),0);
-  await click('continue-talk');await click('choose-direction');await click('collect');
+  await click('continue-without-search');await click('choose-direction');await click('collect');
   const before=calls.length;await page.locator('#draft').fill('我还想继续说。');await click('send');assert.equal(calls.length,before);
   await click('finish-listening');await page.getByText('测试提炼只依据倾诉').waitFor();assert.equal(calls.at(-1).search.enabled,false);
   assert.deepEqual(errors,[]);
-  console.log('Search UI contract passed with fixtures: explicit consent/query review, safe source cards, public-web fallback label, disable search, silent zero calls, summary without search.');
+  console.log('Search UI contract passed with fixtures: explicit consent, hidden processing, safe source cards, disable search, silent zero calls, summary without search.');
 }finally{await browser.close();}

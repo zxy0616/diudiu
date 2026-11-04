@@ -19,5 +19,5 @@ export function searchNotice(result) {
   return (result.requestedScope==='social'&&result.usedScope==='web'?'社交平台公开结果不足，已扩大到公开网页。':'')+'这些是检索参考，个体经历不代表所有人，也不代表你的真实情况。';
 }
 export function referenceCards(sources,esc) {
-  return sources.filter(s=>safeReferenceURL(s.url)).map(s=>`<article class="source-box"><p class="small">参考 [${esc(s.id)}] · ${esc(s.platform||new URL(s.url).hostname)}${s.publishedAt?` · ${esc(s.publishedAt.slice(0,10))}`:''}</p><a href="${esc(safeReferenceURL(s.url))}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a><p>${esc(s.preview||'查看原文了解上下文。')}</p><p class="small">${s.kind==='content'?'正文片段':s.kind==='summary'?'相关摘要':'仅搜索摘要 · 未用于生成'} · 可能需要打开平台或登录查看</p></article>`).join('');
+  return sources.filter(s=>safeReferenceURL(s.url)).map(s=>`<article class="source-box"><p class="small">${esc(s.platform||new URL(s.url).hostname)}${s.publishedAt?` · ${esc(s.publishedAt.slice(0,10))}`:''}</p><a href="${esc(safeReferenceURL(s.url))}" target="_blank" rel="noopener noreferrer">${esc(s.title)}</a><p>${esc(s.preview||'去原文看看完整的故事。')}</p></article>`).join('');
 }

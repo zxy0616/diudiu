@@ -1,0 +1,62 @@
+import {createRequire} from 'node:module';
+import {mkdir} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import assert from 'node:assert/strict';
+import {installAIFixture} from './helpers/ai-fixture.mjs';
+const require=createRequire(import.meta.url);const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
+const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
+const errors=[];page.on('pageerror',e=>errors.push(e.message));
+const calls=await installAIFixture(page,{onRequest:async(p,route)=>route.fulfill({json:{ok:true,...(p.action==='summarize'?{event:'你花了很多心思改论文，却总是摸不准导师的要求。',label:'标准总在变化',options:[{id:'f1',label:'标准总在变化',detail:'你很难知道怎样才算做好。'},{id:'f2',label:'付出没有被认可',detail:'你希望自己的努力被看见。'},{id:'f3',label:'担心自己不够好',detail:'你开始怀疑自己的能力。'}]}:{text:'改了这么多次，要求还是不清楚，确实会让人泄气。先歇一会儿也没关系。'}),tags:['学术','人际关系'],title:'和导师聊不顺的这天',sources:[]}})});
+const click=a=>page.locator(`[data-action="${a}"]`).last().click();
+const screenshot=async name=>page.screenshot({path:fileURLToPath(new URL('../docs/qa/'+name+'.png',import.meta.url)),fullPage:true});
+await mkdir(new URL('../docs/qa/',import.meta.url),{recursive:true});
+try{
+  await page.goto(process.env.TEST_URL||'http://127.0.0.1:4183');
+  assert.ok(!(await page.locator('body').innerText()).includes('AI'));
+  await click('privacy');assert.equal(await page.locator('a[href*="design-kit"],a[href*="策划案"]').count(),0);await click('back');
+  await page.locator('#draft').fill('导师好苛刻，论文改了好多次，我真的很累。');
+  await click('start');await click('accept-start');await click('send');
+  assert.equal(await page.getByText('想要解决',{exact:true}).count(),1);assert.equal(await page.getByText('想要解决（我该怎么做？）').count(),0);
+  await click('collect');assert.equal(calls.length,0);
+  assert.equal(await page.locator('.quiet-scene').evaluate(e=>getComputedStyle(e).backgroundImage),'none');
+  assert.ok((await page.locator('.quiet-scene img').getAttribute('src')).includes('listen.png'));
+  await screenshot('quiet-v2');
+  assert.equal(await page.locator('.composer button').last().innerText(),'就说到这儿吧');
+  await click('finish-listening');await click('ai-consent');await page.locator('.focus-choice').first().waitFor();
+  assert.equal(calls.at(-1).search.enabled,false);
+  await page.locator('[data-id="f1"]').click();await page.locator('[data-id="f2"]').click();assert.equal(await page.locator('.focus-choice[aria-pressed="true"]').count(),2);
+  await screenshot('focus-options');await click('confirm-focus');await page.locator('[data-game="paper"]').click();
+  assert.equal(await page.locator('.object-label').innerText(),'标准总在变化');await click('game-hit');assert.equal(await page.locator('.object-label').innerText(),'付出没有被认可');
+  for(let i=0;i<11;i++)await click('game-hit');assert.equal(await page.locator('#game-object.fallen').count(),0);await click('finish-game');await page.waitForURL('**/#end');
+  await click('basket-save');await page.locator('#custom-tags').fill('毕业季');await click('basket-save-confirm');await page.locator('.paper-card').waitFor();
+  assert.equal(await page.locator('.paper-card').count(),1);assert.ok((await page.locator('.paper-card').innerText()).includes('学术'));
+  const originalId=await page.locator('.paper-card').getAttribute('data-id');
+  await page.evaluate(async()=>{const {saveStory}=await import('./web/basket-store.js');for(const [id,title,tags,text]of [['seed-job','找工作有点难',['求职'],'简历投出去，总收不到回应。'],['seed-love','想念和告别',['感情'],'分开之后，我还是有点想念。']])await saveStory({id,title,tags,messages:[{role:'user',text}],createdAt:Date.now(),updatedAt:Date.now(),mediaKeys:[]});});
+  await click('back');await click('basket-show');await page.waitForFunction(()=>document.querySelectorAll('.paper-card').length===3);await page.locator('#toast').waitFor({state:'hidden'});await screenshot('basket');
+  for(const width of [320,390,430,1280]){await page.setViewportSize({width,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);}
+  await page.setViewportSize({width:390,height:844});
+  await page.reload();await click('basket-show');await page.waitForFunction(()=>document.querySelectorAll('.paper-card').length===3);assert.equal(await page.locator('.paper-card').count(),3);
+  await page.locator('#basket-search').fill('导师');assert.equal(await page.locator('.paper-card').count(),1);assert.equal(await page.locator('#basket-search').evaluate(e=>document.activeElement===e),true);
+  await page.locator('#basket-search').fill('');await page.locator('[data-action="basket-tag"][data-tag="求职"]').click();assert.equal(await page.locator('.paper-card').count(),1);
+  await page.locator('[data-action="basket-tag"][data-tag=""]').click();await page.locator(`.paper-card[data-id="${originalId}"]`).click();await click('basket-continue');
+  assert.equal(calls.length,1,'resuming never sends history automatically');
+  await click('choose-direction');await click('empathize');await click('ai-consent');await page.locator('[data-message="assistant"]').waitFor();
+  assert.ok(calls.at(-1).messages.some(m=>m.content.includes('导师好苛刻')));
+  await page.locator('#draft').fill('今天我想先把需要问清楚的问题写下来。');await click('send');await page.waitForFunction(()=>document.querySelectorAll('[data-message="assistant"]').length===2);
+  await click('summarize');await page.locator('.focus-choice').first().waitFor();await click('listen-end');await click('basket-save');await click('basket-save-confirm');await page.locator('.paper-card').first().waitFor();
+  assert.equal(await page.locator('.paper-card').count(),3,'resaving updates the same record');
+  const stored=await page.evaluate(async id=>(await import('./web/basket-store.js')).getStory(id),originalId);assert.ok(stored.tags.includes('毕业季'));assert.equal(stored.messages.filter(m=>m.role==='assistant').length,2);
+  await page.locator(`.paper-card[data-id="${originalId}"]`).click();await click('basket-delete');await click('basket-delete-confirm');await page.waitForFunction(()=>document.querySelectorAll('.paper-card').length===2);
+  const mediaCheck=await page.evaluate(async()=>{
+    const store=await import('./web/basket-store.js');const blob=new Blob(['synthetic-media'],{type:'image/png'});
+    const story={id:'media-check',title:'附件测试',tags:['测试'],messages:[{role:'user',text:'合成附件',imageKeys:['media-check:0:image:0']}],updatedAt:Date.now(),createdAt:Date.now()};
+    await store.saveStory(story,[{id:'media-check:0:image:0',blob}]);
+    const hydrated=await store.hydrateStory(await store.getStory(story.id));const text=await hydrated.messages[0].images[0].blob.text();URL.revokeObjectURL(hydrated.messages[0].images[0].url);
+    const put=IDBObjectStore.prototype.put;IDBObjectStore.prototype.put=function(){throw new DOMException('full','QuotaExceededError');};let failed=false;try{await store.saveStory({...story,title:'不应覆盖旧标题'},[]);}catch{failed=true;}finally{IDBObjectStore.prototype.put=put;}
+    const preserved=await store.getStory(story.id);await store.deleteStory(story.id);return {text,failed,preservedTitle:preserved.title,deleted:!(await store.getStory(story.id))};
+  });
+  assert.deepEqual(mediaCheck,{text:'synthetic-media',failed:true,preservedTitle:'附件测试',deleted:true});
+  assert.deepEqual(errors,[]);
+  console.log('Basket browser checks passed: warm copy, quiet plain background, multi-select/rotating targets, voluntary save, auto/custom tags, refresh, search/filter, resume/update, scoped delete, media persistence and atomic quota failure.');
+}finally{await browser.close();}

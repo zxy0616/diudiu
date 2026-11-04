@@ -30,7 +30,7 @@ try{
   await click('send');await click('collect');
   assert.equal(await page.locator('[data-message="assistant"]').count(),0);
   assert.equal(await page.locator('[data-message="user"] audio').count(),1);
-  await click('exit');await click('confirm-exit');
+  await click('exit');await click('basket-discard');
   assert.equal(await page.locator('audio').count(),0);
   await page.reload();assert.equal(await page.locator('.attachment').count(),0);
   assert.deepEqual(errors,[]);

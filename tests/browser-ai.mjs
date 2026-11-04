@@ -21,7 +21,7 @@ try{
   await click('start');await click('accept-start');await click('send');await click('empathize');
   assert.equal(calls.length,0,'no text is sent before consent');
   await click('ai-consent');
-  await page.waitForFunction(()=>document.querySelector('[role="status"]')?.textContent.includes('认真想'));
+  await page.waitForFunction(()=>document.querySelector('[role="status"]')?.textContent.includes('认真听'));
   await page.waitForTimeout(100);
   assert.equal(calls.length,1);
   await click('choose-direction');await click('collect');
@@ -29,7 +29,7 @@ try{
   assert.equal(await page.locator('[data-message="assistant"]').count(),0);
   assert.equal(await page.getByText('不应显示的过期回复').count(),0);
   phase='error';await click('choose-direction');await click('solve');
-  await page.getByText('上游限流测试').waitFor();
+  await page.getByText('这会儿没能回应上，你写的话还在，可以再试一下。').waitFor();
   assert.equal(await page.locator('[data-message="assistant"]').count(),0,'errors do not fall back to canned replies');
   phase='ok';await click('ai-retry');await page.getByText('按当前方向返回的测试回应').waitFor();
   assert.equal(calls.at(-1).intent,'solve');

@@ -12,7 +12,7 @@ async function connect(){
   if(instance)return instance;
   const config=await getConfig();
   const {default:cloudbase}=await import('./vendor/cloudbase-3.11.0.js');
-  const app=cloudbase.init({env:config.env,region:config.region,accessKey:config.accessKey,auth:{detectSessionInUrl:true}});
+  const app=cloudbase.init({env:config.env,region:config.region,accessKey:config.accessKey,timeout:85000,auth:{detectSessionInUrl:true}});
   const auth=typeof app.auth==='function'?app.auth():app.auth;
   instance={app,auth,config};
   auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT')window.dispatchEvent(new Event('diudiu-signed-out'));});

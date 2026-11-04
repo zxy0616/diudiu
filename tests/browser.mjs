@@ -60,8 +60,8 @@ try{
   await click('choose-direction');await click('empathize');
   await page.locator('[data-message="assistant"]').waitFor();
   assert.equal(await page.locator('[data-message="assistant"]').count(),1);
-  await click('sources');await click('search-empty');
-  assert.ok(await page.getByText('暂时没有贴近的来源。').count());
+  await click('sources');
+  assert.ok(await page.getByText('也有人经历过这些').count());
   await click('back');await click('memories');await click('new-memory');
   await page.locator('#memory-text').fill('<img src=x onerror=alert(1)> 背景测试');await click('confirm-memory');
   assert.equal(await page.locator('.list-row img').count(),0,'memory text is escaped');

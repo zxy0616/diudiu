@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {RequestGate,textPayload} from '../web/request-gate.js';
 const require=createRequire(import.meta.url);
-const {createService,buildRequest,parseResult,endpoint}=require('../cloudfunctions/diudiu-ai/service.js');
+const {createService:createServiceRaw,buildRequest,parseResult,endpoint}=require('../cloudfunctions/diudiu-ai/service.js');
+const createService=options=>createServiceRaw({analyzeImpl:async()=>({intent:'empathize',keywords:['工作','反复修改'],queries:['工作反复修改 相似经历'],tags:['职场'],title:'工作烦恼',origin:'fixture',tokens:0}),...options});
 const env={LLM_API_KEY:'test-only-not-a-real-secret',LLM_BASE_URL:'https://model.example/v1',LLM_MODEL:'fixture-model'};
 const payload={action:'respond',intent:'empathize',messages:[{role:'user',content:'今天努力没有被看见'}],requestId:'12345678-1234-1234-1234-123456789012'};
 const user=()=>({uid:'test-uid',isAnonymous:false});
@@ -27,7 +28,7 @@ test('只发送文字和主动选用的背景，不发送附件或本地URL',()=
   assert.ok(!JSON.stringify(p).includes('blob:'));
 });
 test('真实回复结构、无假来源、同一请求并发只调用一次',async()=>{
-  let calls=0;const service=createService({getIdentity:user,env,fetchImpl:async(url,options)=>{calls++;assert.equal(url,'https://model.example/v1/chat/completions');const b=JSON.parse(options.body);assert.equal(b.max_tokens,1000);return {ok:true,json:async()=>({choices:[{message:{content:'辛苦了，这份委屈值得被认真听见。'}}],usage:{total_tokens:56}})};}});
+  let calls=0;const service=createService({getIdentity:user,env,fetchImpl:async(url,options)=>{calls++;assert.equal(url,'https://model.example/v1/chat/completions');const b=JSON.parse(options.body);assert.equal(b.max_tokens,1200);return {ok:true,json:async()=>({choices:[{message:{content:'辛苦了，这份委屈值得被认真听见。'}}],usage:{total_tokens:56}})};}});
   const [a,b]=await Promise.all([service(payload),service(payload)]);assert.equal(calls,1);assert.deepEqual(a,b);assert.equal(a.usage.totalTokens,56);assert.deepEqual(a.sources,[]);
 });
 test('失败不会退回演示话术，也不会泄漏上游错误或密钥',async()=>{
@@ -38,7 +39,7 @@ test('失败不会退回演示话术，也不会泄漏上游错误或密钥',asy
   assert.equal((await createService({getIdentity:user,env:{}})(payload)).error.code,'NOT_CONFIGURED');
 });
 test('提炼校验、上下文限制和服务器固定接口地址',()=>{
-  assert.deepEqual(parseResult('summarize','{"event":"改了三次，标准仍不清楚","label":"标准反复变化"}'),{event:'改了三次，标准仍不清楚',label:'标准反复变化'});
+  assert.deepEqual(parseResult('summarize','{"event":"改了三次，标准仍不清楚","label":"标准反复变化"}'),{event:'改了三次，标准仍不清楚',label:'标准反复变化',options:[{id:'focus-1',label:'标准反复变化',detail:''}],tags:[],title:''});
   assert.throws(()=>parseResult('summarize',JSON.stringify({event:'事件',label:'烦'.repeat(17)})));
   assert.throws(()=>buildRequest({...payload,messages:[{role:'user',content:'字'.repeat(4001)}]}));
   assert.throws(()=>endpoint('http://127.0.0.1/'));

@@ -4,8 +4,9 @@ import {createRequire} from 'node:module';
 import {suggestSearchQuery,referenceCards} from '../web/search-ui.js';
 import {escapeHTML} from '../web/core.js';
 const require=createRequire(import.meta.url);
-const {createService}=require('../cloudfunctions/diudiu-ai/service.js');
+const {createService:createServiceRaw}=require('../cloudfunctions/diudiu-ai/service.js');
 const {searchOptions,searchWeb,normalizeSources,searchConfigured}=require('../cloudfunctions/diudiu-ai/search.js');
+const createService=options=>createServiceRaw({analyzeImpl:async()=>({intent:'empathize',keywords:['工作','反复修改'],queries:['工作反复修改 相似经历'],tags:['职场'],title:'工作烦恼',origin:'fixture',tokens:0}),...options});
 const env={LLM_API_KEY:'fixture-model-key',LLM_BASE_URL:'https://model.example/v1',LLM_MODEL:'fixture',SEARCH_API_KEY:'fixture-search-key',SEARCH_API_URL:'https://open.feedcoopapi.com/search_api/web_search'};
 const payload={action:'respond',intent:'empathize',messages:[{role:'user',content:'私人原话：张三在某公司修改方案'}],requestId:'request-000000000001',search:{enabled:true,query:'工作反复修改 相似经历',scope:'social'}};
 const identity=()=>({uid:'test-user',isAnonymous:false});
@@ -20,7 +21,7 @@ test('检索先于生成，密钥隔离，不发送倾诉原文，同请求去�
   }});
   const [a,b]=await Promise.all([service(payload),service(payload)]);
   assert.equal(a.ok,true);assert.deepEqual(a,b);assert.equal(calls.length,2);assert.equal(a.search.requestCount,1);assert.equal(a.sources[0].platform,'小红书');assert.ok(!a.text.includes('[99]'));assert.ok(!('excerpt' in a.sources[0]));
-  assert.equal((await service({...payload,search:{...payload.search,query:'不同查询'}})).error.code,'INVALID_REQUEST');
+  assert.equal((await service({...payload,messages:[{role:'user',content:'这次请求的内容已经改变'}]})).error.code,'INVALID_REQUEST');
 });
 test('未登录和静默不检索；提炼即使携带搜索标记也强制关闭',async()=>{
   let calls=0;const fetchImpl=async(url)=>{calls++;assert.notEqual(url,env.SEARCH_API_URL);return {ok:true,json:async()=>({choices:[{message:{content:'{"event":"修改方案","label":"反复修改"}'}}]})};};

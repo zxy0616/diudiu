@@ -5,5 +5,12 @@ export class RequestGate {
   cancel(){this.#revision++;}
 }
 export function textPayload(messages,context='') {
-  return {messages:messages.filter(m=>typeof m.text==='string'&&m.text.trim()).map(m=>({role:'user',content:m.text.trim()})),context:context||''};
+  const selected=[];let length=0;
+  for(const m of [...messages].reverse()) {
+    if(typeof m.text!=='string'||!m.text.trim())continue;
+    const content=m.text.trim().slice(-4000);
+    if(selected.length>=30||length+content.length>16000)break;
+    selected.unshift({role:m.role==='assistant'?'assistant':'user',content});length+=content.length;
+  }
+  return {messages:selected,context:context||''};
 }
