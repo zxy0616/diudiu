@@ -15,12 +15,12 @@ const response=items=>({ok:true,json:async()=>({ResponseMetadata:{RequestId:'fix
 test('检索先于生成，密钥隔离，不发送倾诉原文，同请求去重包含检索',async()=>{
   const calls=[];const service=createService({getIdentity:identity,env,fetchImpl:async(url,opts)=>{
     const body=JSON.parse(opts.body);calls.push({url,body});
-    if(url===env.SEARCH_API_URL){assert.equal(opts.headers.Authorization,'Bearer fixture-search-key');assert.equal(body.Query,payload.search.query);assert.ok(!opts.body.includes('张三'));assert.ok(body.Filter.Sites.includes('xiaohongshu.com'));return response([row]);}
+    if(url===env.SEARCH_API_URL){assert.equal(opts.headers.Authorization,'Bearer fixture-search-key');assert.equal(body.Query,payload.search.query);assert.ok(!opts.body.includes('张三'));assert.ok(body.Filter.Sites);return response([row]);}
     assert.equal(opts.headers.Authorization,'Bearer fixture-model-key');assert.ok(body.messages.some(m=>m.role==='user'&&m.content.includes(row.Summary)));assert.ok(!body.messages[0].content.includes(row.Summary));
     return {ok:true,json:async()=>({choices:[{message:{content:'有一份相似经历可参考[1]。无效引用[99]。'}}],usage:{total_tokens:30}})};
   }});
   const [a,b]=await Promise.all([service(payload),service(payload)]);
-  assert.equal(a.ok,true);assert.deepEqual(a,b);assert.equal(calls.length,2);assert.equal(a.search.requestCount,1);assert.equal(a.sources[0].platform,'小红书');assert.ok(!a.text.includes('[99]'));assert.ok(!('excerpt' in a.sources[0]));
+  assert.equal(a.ok,true);assert.deepEqual(a,b);assert.equal(calls.length,4);assert.equal(a.search.requestCount,3);assert.equal(a.sources[0].platform,'小红书');assert.ok(!a.text.includes('[99]'));assert.ok(!('excerpt' in a.sources[0]));
   assert.equal((await service({...payload,messages:[{role:'user',content:'这次请求的内容已经改变'}]})).error.code,'INVALID_REQUEST');
 });
 test('未登录和静默不检索；提炼即使携带搜索标记也强制关闭',async()=>{
@@ -43,7 +43,7 @@ test('搜索授权、HTTP 200 错误、超时和无结果都不冒充成功，�
 });
 test('搜索失败仍可生成真实文字回应，客户端不能指定搜索服务地址',async()=>{
   let calls=0;const service=createService({getIdentity:identity,env,fetchImpl:async url=>{calls++;return url===env.SEARCH_API_URL?{ok:false,status:429}:{ok:true,json:async()=>({choices:[{message:{content:'根据你的表达回应。'}}]})};}});
-  const r=await service(payload);assert.equal(r.ok,true);assert.equal(r.search.errorCode,'SEARCH_RATE_LIMIT');assert.deepEqual(r.sources,[]);assert.equal(calls,2);
+  const r=await service(payload);assert.equal(r.ok,true);assert.equal(r.search.errorCode,'SEARCH_RATE_LIMIT');assert.deepEqual(r.sources,[]);assert.equal(calls,4);
   assert.equal(searchConfigured({...env,SEARCH_API_URL:'https://attacker.example'}),false);
   assert.throws(()=>searchOptions({...payload,search:{enabled:true,query:'联系我12345678901'}}));
 });

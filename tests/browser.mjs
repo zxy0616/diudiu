@@ -23,9 +23,8 @@ try{
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`home overflow at ${width}`);
   }
   await page.setViewportSize({width:390,height:844});
-  await page.locator('#draft').fill('改了三次方案，截止时间却没变。');
   await click('start');await click('accept-start');
-  assert.equal(await page.locator('#draft').inputValue(),'改了三次方案，截止时间却没变。');
+  await page.locator('#draft').fill('改了三次方案，截止时间却没变。');
   await click('send');await click('collect');
   for(let i=0;i<5;i++){
     await page.locator('#draft').fill('我还有一些话没说完 '+i);

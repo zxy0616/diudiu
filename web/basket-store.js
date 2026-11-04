@@ -54,7 +54,7 @@ export async function clearStories(){const db=await open();return new Promise((r
 export async function snapshotStory(state,{title,tags,keepMedia,id=state.archiveId||crypto.randomUUID()}){
   const media=[];const messages=[];
   for(const [i,m]of state.messages.entries()){
-    const copy={role:m.role==='assistant'?'assistant':'user',text:m.text||'',imageKeys:[],audioKey:null,imageCount:m.images?.length||0,audioPresent:!!m.audio};
+    const copy={role:m.role==='assistant'?'assistant':'user',text:m.text||'',recognitions:(m.recognitions||[]).map(r=>({kind:r.kind,index:r.index,text:r.text})),imageKeys:[],audioKey:null,imageCount:m.images?.length||0,audioPresent:!!m.audio};
     if(keepMedia){
       for(const [n,img]of (m.images||[]).entries()){const blob=img.blob||await (await fetch(img.url)).blob();const key=id+':'+i+':image:'+n;media.push({id:key,blob});copy.imageKeys.push(key);}
       if(m.audio){const blob=m.audio.blob||await (await fetch(m.audio.url)).blob();const key=id+':'+i+':audio';media.push({id:key,blob});copy.audioKey=key;}
@@ -65,5 +65,5 @@ export async function snapshotStory(state,{title,tags,keepMedia,id=state.archive
   const now=Date.now();return {story:{id,title,tags:cleanTags(tags),messages,summary:state.summary,selectedFocusIds:state.selectedFocusIds||[],focuses:state.savedFocuses||[],intent:state.intent,context:state.context||null,createdAt:state.storyCreatedAt||now,updatedAt:now,keepMedia},media};
 }
 export function filterStories(stories,query='',tag=''){
-  const q=query.trim().toLocaleLowerCase();return stories.filter(s=>(!tag||s.tags.includes(tag))&&(!q||[s.title,...s.tags,...s.messages.map(m=>m.text)].join(' ').toLocaleLowerCase().includes(q)));
+  const q=query.trim().toLocaleLowerCase();return stories.filter(s=>(!tag||s.tags.includes(tag))&&(!q||[s.title,...s.tags,...s.messages.flatMap(m=>[m.text,...(m.recognitions||[]).map(r=>r.text)])].join(' ').toLocaleLowerCase().includes(q)));
 }

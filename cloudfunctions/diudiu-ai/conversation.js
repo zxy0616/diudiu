@@ -40,7 +40,8 @@ function parseAnalysis(text,input) {
   const keywords=uniqueText(data.keywords).filter(safeQuery);
   const queries=uniqueText(data.queries,2,60).filter(safeQuery);
   if(keywords.length<2||!queries.length||!['empathize','solve'].includes(data.intent))throw Error('INVALID_ANALYSIS');
-  return {intent:data.intent,keywords,queries,tags:categoryTags(data.tags),title:typeof data.title==='string'?Array.from(humanText(data.title)).slice(0,24).join(''):'',origin:'model',tokens:0};
+  const keywordQueries=[keywords.slice(0,3).join(' '),...(keywords.length>3?[[keywords[0],...keywords.slice(3)].join(' ')]:[])];
+  return {intent:data.intent,keywords,queries:keywordQueries,tags:categoryTags(data.tags),title:typeof data.title==='string'?Array.from(humanText(data.title)).slice(0,24).join(''):'',origin:'model',tokens:0};
 }
 async function analyze(input,{url,env,fetchImpl}) {
   let tokens=0;const diagnostics={reason:'unavailable'};

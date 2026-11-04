@@ -15,8 +15,8 @@ try{
   await page.goto(process.env.TEST_URL||'http://127.0.0.1:4183');
   assert.ok(!(await page.locator('body').innerText()).includes('AI'));
   await click('privacy');assert.equal(await page.locator('a[href*="design-kit"],a[href*="策划案"]').count(),0);await click('back');
-  await page.locator('#draft').fill('导师好苛刻，论文改了好多次，我真的很累。');
-  await click('start');await click('accept-start');await click('send');
+  await click('start');await click('accept-start');
+  await page.locator('#draft').fill('导师好苛刻，论文改了好多次，我真的很累。');await click('send');
   assert.equal(await page.getByText('想要解决',{exact:true}).count(),1);assert.equal(await page.getByText('想要解决（我该怎么做？）').count(),0);
   await click('collect');assert.equal(calls.length,0);
   assert.equal(await page.locator('.quiet-scene').evaluate(e=>getComputedStyle(e).backgroundImage),'none');

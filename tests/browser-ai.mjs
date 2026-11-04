@@ -17,8 +17,8 @@ const calls=await installAIFixture(page,{onRequest:async(p,route)=>{
 const click=a=>page.locator(`[data-action="${a}"]`).last().click();
 try{
   await page.goto(process.env.TEST_URL||'http://127.0.0.1:4180');
-  await page.locator('#draft').fill('我明明很努力，却没有被看见。');
-  await click('start');await click('accept-start');await click('send');await click('empathize');
+  await click('start');await click('accept-start');
+  await page.locator('#draft').fill('我明明很努力，却没有被看见。');await click('send');await click('empathize');
   assert.equal(calls.length,0,'no text is sent before consent');
   await click('ai-consent');
   await page.waitForFunction(()=>document.querySelector('[role="status"]')?.textContent.includes('认真听'));

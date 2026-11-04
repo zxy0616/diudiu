@@ -21,7 +21,7 @@ const login=async(password='fixture-password')=>{await page.locator('#ai-usernam
 try{
   await page.goto(process.env.TEST_URL||'http://127.0.0.1:4183');
   await page.locator('#ai-username').waitFor();
-  assert.equal(await page.locator('#draft').getAttribute('readonly'),'');
+  assert.equal(await page.locator('#draft').count(),0,'home has only the conversation entry');
   assert.equal(calls.length,0);
   await mkdir(new URL('../docs/qa/',import.meta.url),{recursive:true});
   await page.screenshot({path:fileURLToPath(new URL('../docs/qa/login-start.png',import.meta.url)),fullPage:true});
@@ -44,7 +44,7 @@ try{
   assert.equal(await page.locator('dialog[open] #ai-password').count(),0);
   assert.equal(await page.locator('[data-message="user"]').count(),2);
   await click('ai-show-login');await login();await page.locator('[data-message="assistant"]').nth(1).waitFor();
-  await page.reload();await page.locator('#draft:not([readonly])').waitFor();
+  await page.reload();await page.locator('.home[data-authenticated="true"]').waitFor();
   assert.equal(await page.locator('dialog[open]').count(),0,'saved login skips the startup prompt');
   // A saved story is readable locally; continuing it checks login before restoring it.
   await page.evaluate(async()=>{const {saveStory}=await import('/web/basket-store.js');await saveStory({id:'auth-fixture-story',title:'还想说的话',tags:['求职'],messages:[{role:'user',text:'上次没有说完的求职烦恼。'}],intent:'collect',updatedAt:Date.now()});localStorage.removeItem('test-session');});

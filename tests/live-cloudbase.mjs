@@ -32,14 +32,15 @@ try{
   assert.deepEqual(errors,[]);
   console.log(JSON.stringify({applicationLogin:'passed',functionRoundTrip:'passed',modelConfigured:status.configured,liveModelTest:'not run'}));
   await page.reload({waitUntil:'networkidle'});
-  await page.locator('#draft:not([readonly])').waitFor({timeout:20000});
+  await page.locator('.home[data-authenticated="true"]').waitFor({timeout:20000});
   assert.equal(await page.locator('dialog[open] #ai-password').count(),0);
   console.log(JSON.stringify({loginAtArrival:'passed',retainedLoginAfterReload:'passed'}));
   await page.locator('[data-action="privacy"]').last().click();
   if(process.env.RUN_LIVE_BASKET_UI==='1') {
     await page.locator('[data-action="back"]').click();
+    for(const entry of ['start','accept-start'])await page.locator(`[data-action="${entry}"]`).last().click();
     await page.locator('#draft').fill('虚构联调：为什么找不到工作？投了很多简历却没回音，我有点迷茫，也不知道该怎么调整。');
-    for(const action of ['start','accept-start','send','solve','ai-consent'])await page.locator(`[data-action="${action}"]`).last().click();
+    for(const action of ['send','solve','ai-consent'])await page.locator(`[data-action="${action}"]`).last().click();
     await page.locator('[data-message="assistant"]').waitFor({timeout:85000});
     const reply=await page.locator('[data-message="assistant"]').innerText();
     assert.ok(!/你必须|你应该|别再|大概率|作为\s*AI|用户/.test(reply),'Reply must follow the gentle tone constraints');
@@ -75,8 +76,9 @@ try{
   }
   if(process.env.RUN_LIVE_SEARCH_UI==='1') {
     await page.locator('[data-action="back"]').click();
+    for(const entry of ['start','accept-start'])await page.locator(`[data-action="${entry}"]`).last().click();
     await page.locator('#draft').fill('虚构联调场景：工作方案反复修改，我感觉自己的努力没有被理解。');
-    for(const action of ['start','accept-start','send','empathize'])await page.locator(`[data-action="${action}"]`).last().click();
+    for(const action of ['send','empathize'])await page.locator(`[data-action="${action}"]`).last().click();
     await page.locator('[data-action="ai-consent"]').click();
     await page.locator('[data-message="assistant"]').waitFor({timeout:60000});
     await page.locator('[data-action="sources"]').click();

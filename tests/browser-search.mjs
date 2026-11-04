@@ -13,8 +13,8 @@ const calls=await installAIFixture(page,{onRequest:async(p,route)=>{
 const click=a=>page.locator(`[data-action="${a}"]`).last().click();
 try{
   await page.goto(process.env.TEST_URL||'http://127.0.0.1:4182');
-  await page.locator('#draft').fill('张三在某公司改了三次方案，电话13800138000。');
-  await click('start');await click('accept-start');await click('send');await click('empathize');
+  await click('start');await click('accept-start');
+  await page.locator('#draft').fill('张三在某公司改了三次方案，电话13800138000。');await click('send');await click('empathize');
   assert.equal(calls.length,0);
   assert.equal(await page.locator('#ai-search-query').count(),0);await click('ai-consent');
   await page.locator('[data-message="assistant"]').waitFor();
@@ -23,6 +23,8 @@ try{
   assert.equal(await page.locator('.source-box a').count(),1);assert.equal(await page.locator('.source-box img').count(),0);
   assert.equal(await page.locator('.source-box a').getAttribute('href'),'https://example.com/fixture');
   assert.equal(await page.locator('#query,#search-scope').count(),0);assert.ok(!(await page.locator('body').innerText()).includes('检索'));
+  await page.locator('[data-action="source-platform"][data-platform="小红书"]').click();await page.getByText('这次暂时没找到小红书的相关公开内容，换个平台看看也可以。').waitFor();assert.equal(await page.locator('.source-box a').count(),0);
+  await page.locator('[data-action="source-platform"][data-platform=""]').click();assert.equal(await page.locator('.source-box a').count(),1);
   await page.locator('#search-toggle').uncheck();await click('ai-search-respond');await page.waitForFunction(()=>document.querySelectorAll('[data-message="assistant"]').length===2);
   assert.equal(calls.at(-1).search.enabled,false);
   await click('sources');assert.equal(await page.locator('.source-box a').count(),0);

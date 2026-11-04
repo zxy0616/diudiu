@@ -1,6 +1,6 @@
 let instance;
 let configPromise;
-export class AIError extends Error {constructor(code,message){super(message);this.code=code;}}
+export class AIError extends Error {constructor(code,message,diagnostics){super(message);this.code=code;if(diagnostics)this.diagnostics=diagnostics;}}
 export async function getConfig(){
   configPromise ||= fetch(new URL('./cloudbase-config.json',import.meta.url),{cache:'no-store'}).then(async r=>{
     if(!r.ok)throw new AIError('CONFIG_REQUIRED','尚未配置 CloudBase 连接，请按接入说明生成本机配置。');
@@ -28,7 +28,7 @@ export async function invokeAI(payload){
     const response=await app.callFunction({name:config.functionName,data:{...payload,requestId:crypto.randomUUID()}});
     let result=response.result;
     if(typeof result==='string')result=JSON.parse(result);
-    if(!result?.ok)throw new AIError(result?.error?.code||'SERVICE_UNAVAILABLE',result?.error?.message||'在线服务暂时不可用，请稍后重试。');
+    if(!result?.ok)throw new AIError(result?.error?.code||'SERVICE_UNAVAILABLE',result?.error?.message||'在线服务暂时不可用，请稍后重试。',result?.error?.diagnostics);
     return result;
   }catch(e){if(e instanceof AIError)throw e;throw new AIError('SERVICE_UNAVAILABLE','暂时连不上在线服务，内容仍在当前页面。请稍后重试。');}
 }
