@@ -3,10 +3,12 @@ import { createRequire } from 'node:module';
 import { mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
+import {installAIFixture} from './helpers/ai-fixture.mjs';
 const require=createRequire(import.meta.url);
 const { chromium }=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
 const page=await browser.newPage({viewport:{width:390,height:844},deviceScaleFactor:1,reducedMotion:'reduce'});
+const aiCalls=await installAIFixture(page);
 const errors=[];const failed=[];
 page.on('pageerror',e=>errors.push(e.message));
 page.on('response',r=>{if(r.status()>=400)failed.push(r.url());});
@@ -32,7 +34,9 @@ try{
     assert.equal(await page.locator('[data-message="user"]').count(),i+2);
   }
   await page.screenshot({path:fileURLToPath(new URL('../docs/qa/quiet.png',import.meta.url)),fullPage:true});
+  assert.equal(aiCalls.length,0,'silent collection makes no AI requests');
   await click('finish-listening');
+  await click('ai-consent');
   await click('correct');
   await page.locator('#correct-label').fill('反复返工，标准不清');
   await click('confirm-correct');await click('release');await click('confirm-target');
@@ -54,6 +58,7 @@ try{
   await click('finish-game');await click('no-relief');await click('continue-talk');
   assert.ok(await page.locator('[data-message="user"]').count()>=6,'flush does not delete conversation');
   await click('choose-direction');await click('empathize');
+  await page.locator('[data-message="assistant"]').waitFor();
   assert.equal(await page.locator('[data-message="assistant"]').count(),1);
   await click('sources');await click('search-empty');
   assert.ok(await page.getByText('暂时没有贴近的来源。').count());

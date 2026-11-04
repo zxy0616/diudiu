@@ -13,9 +13,13 @@ try{
   const bytes=await page.evaluate(async()=>{const c=document.createElement('canvas');c.width=200;c.height=100;const ctx=c.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,200,100);ctx.fillStyle='black';ctx.fillText('Synthetic private name',20,40);return [...new Uint8Array(await (await new Promise(r=>c.toBlob(r))).arrayBuffer())];});
   await page.locator('#image-picker').setInputFiles({name:'synthetic.png',mimeType:'image/png',buffer:Buffer.from(bytes)});
   await page.locator('#image-canvas[data-ready="true"]').waitFor();
+  // Hover waits for a stable canvas and scrolls it into view before raw mouse coordinates.
+  await page.locator('#image-canvas').hover({position:{x:10,y:10}});
   const box=await page.locator('#image-canvas').boundingBox();
-  await page.mouse.move(box.x+10,box.y+10);await page.mouse.down();await page.mouse.move(box.x+box.width-10,box.y+box.height-10);await page.mouse.up();
+  await page.mouse.move(box.x+10,box.y+10);await page.mouse.down();await page.mouse.move(box.x+box.width-10,box.y+box.height-10,{steps:10});await page.mouse.up();
   await click('accept-image');
+  // toBlob is asynchronous; the old attachment remains until the modal closes.
+  await page.waitForFunction(()=>!document.querySelector('dialog[open]'));
   const pixel=await page.locator('.attachment img:not(.icon)').evaluate(async img=>{await img.decode();const c=document.createElement('canvas');c.width=200;c.height=100;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);return [...ctx.getImageData(100,50,1,1).data];});
   assert.deepEqual(pixel,[76,43,24,255],'redaction is baked into opaque pixel data');
   await click('record');await click('confirm-record');

@@ -11,3 +11,4 @@ test-results/
 .local/
 private-data/
 dist/
+web/cloudbase-config.json

@@ -1,0 +1,9 @@
+{
+  "name": "diudiu-sdk-vendor-tools",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@cloudbase/js-sdk": "3.11.0",
+    "esbuild": "0.25.12"
+  }
+}
